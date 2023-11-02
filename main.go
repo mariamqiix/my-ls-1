@@ -3,6 +3,7 @@ package main
 import (
 	// "flag"
 	"fmt"
+	"io/fs"
 	"log"
 	"os"
 	"strings"
@@ -14,21 +15,13 @@ var a_flag bool
 var r_flag bool
 var t_flag bool
 var ls bool
+var pathname string
 
 func main() {
-	pathname := validation()
-	if !l_flag && !r_flag && !R_flag && !a_flag && !t_flag {
-		listing(pathname)
-	}
+	pathname = validation()
+	x := listing(pathname)
+	Print(pathname,x)
 
-	// listing(pathname)
-	// fmt.Print(R_flag)
-	// if R_flag {
-	// 	err := listFilesRecursively(pathname, "")
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// }
 
 }
 
@@ -67,7 +60,7 @@ func main() {
 // 	return pathname,R_flag
 // }
 
-func listing(dir string) {
+func listing(dir string) ([]fs.FileInfo) {
 	file, err := os.Open(dir)
 	if err != nil {
 		log.Fatal(err)
@@ -79,16 +72,37 @@ func listing(dir string) {
 		log.Fatal(err)
 	}
 
-	for _, fileInfo := range fileInfos {
-		if fileInfo.Name()[0] != '.' && !a_flag {
+	return fileInfos
+	
+}
+
+
+func Print(path string , fileInfos []fs.FileInfo){
+	for i := 0 ; i < len(fileInfos) ; i++ {
+		index := i
+		if r_flag {
+			index = len(fileInfos)-i-1
+		}
+
+		fileInfo := fileInfos[index]
+		if fileInfo.Name()[0] != '.' || a_flag {
 			if fileInfo.IsDir() {
-				fmt.Printf("%s/\n", fileInfo.Name())
+				fmt.Printf("%s/  ", fileInfo.Name() )
+				if R_flag {
+					subPath := path + "./" + fileInfo.Name()
+					fmt.Println("\n" + subPath + ":")
+					Print(subPath,listing(subPath))
+				}
 			} else {
-				fmt.Print(fileInfo.Name(), " ")
+				fmt.Print(fileInfo.Name() + "  " )
 			}
 		}
 	}
-	fmt.Println()
+	
+	if a_flag {
+		// to print the i
+		fmt.Println("./  ../  ")
+	}
 }
 
 // func listFilesRecursively(dirPath, indent string) error {
@@ -105,7 +119,6 @@ func listing(dir string) {
 
 // 	for _, fileInfo := range fileInfos {
 // 		fileName := fileInfo.Name()
-// 		fileInfo.
 // 		if fileName != "." && fileName != ".." {
 // 			fmt.Print(indent)
 // 			if fileInfo.IsDir() {
