@@ -19,12 +19,7 @@ var ls bool
 func main() {
 	pathname := validation()
 	x := listing(pathname)
-	if t_flag {
-	x = SortByDate(x)
-	}
 	Print(pathname,x)
-
-
 }
 
 
@@ -59,9 +54,14 @@ func SortByDate(filesInfos []fs.FileInfo) ([]fs.FileInfo) {
 
 
 func Print(path string , fileInfos []fs.FileInfo){
+	if t_flag {
+		fileInfos = SortByDate(fileInfos)
+	}
+
 	if a_flag && !r_flag {
 		fmt.Println("./  ../  ")
 	}
+	
 	for i := 0 ; i < len(fileInfos) ; i++ {
 		index := i
 		if r_flag {
@@ -84,6 +84,7 @@ func Print(path string , fileInfos []fs.FileInfo){
 	if a_flag && r_flag {
 		fmt.Println("./  ../  ")
 	}
+	fmt.Println()
 	
 }
 
