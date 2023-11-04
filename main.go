@@ -70,11 +70,11 @@ func Print(path string, fileInfos []fs.FileInfo) {
 		if fileInfo.Name()[0] != '.' || a_flag {
 			if l_flag {
 				subpath := path + fileInfo.Name()
-				Gid, UserId , filelinks := returnGroupAndUSerId(subpath)
+				Gid, UserId, filelinks := returnGroupAndUSerId(subpath)
 				mode := fmt.Sprint(fileInfo.Mode())
 				time := fmt.Sprint(fileInfo.ModTime())
 				size := fmt.Sprint(fileInfo.Size())
-				fmt.Print(mode + " " + filelinks + " " + UserId + " " + Gid + " " +size+" "+ time + " ")
+				fmt.Print(mode + " " + filelinks + " " + UserId + " " + Gid + " " + size + " " + time + " ")
 			}
 			if fileInfo.IsDir() {
 				fmt.Printf("%s/  ", fileInfo.Name())
@@ -162,7 +162,7 @@ func returnGroupAndUSerId(path string) (string, string, string) {
 	grId, _ := user.LookupGroupId(GID)
 	usrId, _ := user.LookupId(UID)
 
-	return grId.Name, usrId.Username , flink
+	return grId.Name, usrId.Username, flink
 
 }
 
