@@ -21,8 +21,7 @@ var ls bool
 func main() {
 	pathname := validation()
 	x := listing(pathname)
-	fmt.Print(x[10].Size())
-	// Print(pathname, x)
+	Print(pathname, x)
 }
 
 func listing(dir string) []fs.FileInfo {
@@ -59,8 +58,11 @@ func Print(path string, fileInfos []fs.FileInfo) {
 	}
 
 	if a_flag && !r_flag {
-		x:=listing("../")
-		fmt.Print(x[1].Name())
+		if !R_flag {
+			fmt.Print("../  ./")
+		} else {
+			fmt.Print("./ :")
+		}
 	}
 
 	for i := 0; i < len(fileInfos); i++ {
@@ -77,7 +79,13 @@ func Print(path string, fileInfos []fs.FileInfo) {
 				fmt.Print("\033[34m",fmt.Sprintf("%s/  ", fileInfo.Name()))
 				fmt.Print("\033[97m","")
 				if R_flag {
-					subPath := path + "/" + fileInfo.Name()
+					subPath := ""
+					if path!= "./" {
+					subPath = path + "/" + fileInfo.Name()
+				} else {
+					subPath = path + fileInfo.Name()
+
+				}
 					fmt.Println("\n" + subPath + ":")
 					Print(subPath, listing(subPath))
 					fmt.Println()
