@@ -58,7 +58,8 @@ func Print(path string, fileInfos []fs.FileInfo) {
 	}
 
 	if a_flag && !r_flag {
-		fmt.Print("./  ../  ")
+		x:=listing("../")
+		fmt.Print(x[1].Name())
 	}
 
 	for i := 0; i < len(fileInfos); i++ {
@@ -72,9 +73,16 @@ func Print(path string, fileInfos []fs.FileInfo) {
 				subpath := path + fileInfo.Name()
 				Gid, UserId, filelinks := returnGroupAndUSerId(subpath)
 				mode := fmt.Sprint(fileInfo.Mode())
-				time := fmt.Sprint(fileInfo.ModTime())
+				DateAndTime := fmt.Sprintf("%s %d %d:%d",fileInfo.ModTime().Month().String(),fileInfo.ModTime().Day(),fileInfo.ModTime().Hour(),fileInfo.ModTime().Minute())
 				size := fmt.Sprint(fileInfo.Size())
-				fmt.Print(mode + " " + filelinks + " " + UserId + " " + Gid + " " + size + " " + time + " ")
+				if fileInfo.Size() < 10 {
+					size = "   " +size
+				} else if fileInfo.Size() < 100 {
+					size = "  " +size
+				}else if fileInfo.Size() < 1000 {
+					size = "   " +size
+				}
+				fmt.Print(mode + " " + filelinks + " " + UserId + " " + Gid + " " + size + " " + DateAndTime + " ")
 			}
 			if fileInfo.IsDir() {
 				fmt.Printf("%s/  ", fileInfo.Name())
@@ -155,6 +163,7 @@ func CheckFlag(c rune) {
 
 func returnGroupAndUSerId(path string) (string, string, string) {
 	file_info, _ := os.Stat(path)
+	fmt.Print(file_info)
 	file_sys := file_info.Sys()
 	GID := fmt.Sprint(file_sys.(*syscall.Stat_t).Gid)
 	UID := fmt.Sprint(file_sys.(*syscall.Stat_t).Uid)
@@ -165,6 +174,8 @@ func returnGroupAndUSerId(path string) (string, string, string) {
 	return grId.Name, usrId.Username, flink
 
 }
+
+
 
 // func listFilesRecursively(dirPath, indent string) error {
 // 	dir, err := os.Open(dirPath)
