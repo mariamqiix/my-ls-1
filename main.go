@@ -21,7 +21,8 @@ var ls bool
 func main() {
 	pathname := validation()
 	x := listing(pathname)
-	Print(pathname, x)
+	fmt.Print(x[10].Size())
+	// Print(pathname, x)
 }
 
 func listing(dir string) []fs.FileInfo {
@@ -70,29 +71,20 @@ func Print(path string, fileInfos []fs.FileInfo) {
 		fileInfo := fileInfos[index]
 		if fileInfo.Name()[0] != '.' || a_flag {
 			if l_flag {
-				subpath := path + "/"+ fileInfo.Name()
-				Gid, UserId, filelinks := returnGroupAndUSerId(subpath)
-				mode := fmt.Sprint(fileInfo.Mode())
-				DateAndTime := fmt.Sprintf("%s %d %d:%d",fileInfo.ModTime().Month().String(),fileInfo.ModTime().Day(),fileInfo.ModTime().Hour(),fileInfo.ModTime().Minute())
-				size := fmt.Sprint(fileInfo.Size())
-				if fileInfo.Size() < 10 {
-					size = "   " +size
-				} else if fileInfo.Size() < 100 {
-					size = "  " +size
-				}else if fileInfo.Size() < 1000 {
-					size = "   " +size
-				}
-				fmt.Print(mode + " " + filelinks + " " + UserId + " " + Gid + " " + size + " " + DateAndTime + " ")
+				lFlag(path,fileInfo)
 			}
 			if fileInfo.IsDir() {
-				fmt.Printf("%s/  ", fileInfo.Name())
+				fmt.Print("\033[34m",fmt.Sprintf("%s/  ", fileInfo.Name()))
+				fmt.Print("\033[97m","")
 				if R_flag {
 					subPath := path + "/" + fileInfo.Name()
 					fmt.Println("\n" + subPath + ":")
 					Print(subPath, listing(subPath))
+					fmt.Println()
 				}
 			} else {
-				fmt.Print(fileInfo.Name() + "  ")
+				fmt.Print("\033[33m",fileInfo.Name() + "  ")
+				fmt.Print("\033[97m","")
 			}
 			if l_flag {
 				fmt.Println()
@@ -178,7 +170,21 @@ func returnGroupAndUSerId(path string) (string, string, string) {
 
 }
 
-
+func lFlag(path string,fileInfo fs.FileInfo){
+	subpath := path + "/"+ fileInfo.Name()
+				Gid, UserId, filelinks := returnGroupAndUSerId(subpath)
+				mode := fmt.Sprint(fileInfo.Mode())
+				DateAndTime := fmt.Sprintf("%s %d %d:%d",fileInfo.ModTime().Month().String(),fileInfo.ModTime().Day(),fileInfo.ModTime().Hour(),fileInfo.ModTime().Minute())
+				size := fmt.Sprint(fileInfo.Size())
+				if fileInfo.Size() < 10 {
+					size = "   " +size
+				} else if fileInfo.Size() < 100 {
+					size = "  " +size
+				} else if fileInfo.Size() < 1000 {
+					size = "   " +size
+				}
+				fmt.Print(mode + " " + filelinks + " " + UserId + " " + Gid + " " + size + " " + DateAndTime + " ")
+}
 
 // func listFilesRecursively(dirPath, indent string) error {
 // 	dir, err := os.Open(dirPath)
