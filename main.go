@@ -6,9 +6,9 @@ import (
 	"io/fs"
 	"log"
 	"os"
-	"os/user"
+	// "os/user"
 	"strings"
-	"syscall"
+	// "syscall"
 )
 
 var l_flag bool
@@ -21,6 +21,9 @@ var ls bool
 func main() {
 	pathname := validation()
 	x := listing(pathname)
+	if R_flag {
+		fmt.Println(".:")
+	}
 	Print(pathname, x)
 }
 
@@ -39,6 +42,52 @@ func listing(dir string) []fs.FileInfo {
 
 }
 
+func Print(path string, fileInfos []fs.FileInfo) {
+	if t_flag {
+		fileInfos = SortByDate(fileInfos)
+	}
+
+	if a_flag && !r_flag {
+		if !R_flag {
+			fmt.Print("../  ./")
+		}
+	}
+
+	for i := 0; i < len(fileInfos); i++ {
+		index := i
+		if r_flag {
+			index = len(fileInfos) - i - 1
+		}
+		fileInfo := fileInfos[index]
+		if fileInfo.Name()[0] != '.' || a_flag {
+			if l_flag {
+				lFlag(path, fileInfo)
+			}
+			if fileInfo.IsDir() {
+				fmt.Print("\033[34m", fmt.Sprintf("%s/  ", fileInfo.Name()))
+				fmt.Print("\033[97m", "")
+			} else {
+				fmt.Print("\033[33m", fileInfo.Name()+"  ")
+				fmt.Print("\033[97m", "")
+			}
+			if l_flag {
+				fmt.Println()
+			}
+		}
+	}
+
+	fmt.Println()
+
+	if a_flag && r_flag {
+		fmt.Println("./  ../  ")
+	}
+
+	if R_flag {
+		Rflag(path, fileInfos)
+	}
+
+}
+
 func SortByDate(filesInfos []fs.FileInfo) []fs.FileInfo {
 	n := len(filesInfos)
 	for i := 0; i < n-1; i++ {
@@ -52,19 +101,7 @@ func SortByDate(filesInfos []fs.FileInfo) []fs.FileInfo {
 
 }
 
-func Print(path string, fileInfos []fs.FileInfo) {
-	if t_flag {
-		fileInfos = SortByDate(fileInfos)
-	}
-
-	if a_flag && !r_flag {
-		if !R_flag {
-			fmt.Print("../  ./")
-		} else {
-			fmt.Print("./ :")
-		}
-	}
-
+func Rflag(path string, fileInfos []fs.FileInfo) {
 	for i := 0; i < len(fileInfos); i++ {
 		index := i
 		if r_flag {
@@ -72,38 +109,20 @@ func Print(path string, fileInfos []fs.FileInfo) {
 		}
 		fileInfo := fileInfos[index]
 		if fileInfo.Name()[0] != '.' || a_flag {
-			if l_flag {
-				lFlag(path,fileInfo)
-			}
 			if fileInfo.IsDir() {
-				fmt.Print("\033[34m",fmt.Sprintf("%s/  ", fileInfo.Name()))
-				fmt.Print("\033[97m","")
-				if R_flag {
-					subPath := ""
-					if path!= "./" {
+				subPath := ""
+				if path != "./" {
 					subPath = path + "/" + fileInfo.Name()
 				} else {
 					subPath = path + fileInfo.Name()
 
 				}
-					fmt.Println("\n" + subPath + ":")
-					Print(subPath, listing(subPath))
-					fmt.Println()
-				}
-			} else {
-				fmt.Print("\033[33m",fileInfo.Name() + "  ")
-				fmt.Print("\033[97m","")
-			}
-			if l_flag {
-				fmt.Println()
+				fmt.Println("\n" + subPath + ":")
+				fmt.Print("\033[97m", "")
+				Print(subPath, listing(subPath))
 			}
 		}
 	}
-	if a_flag && r_flag {
-		fmt.Println("./  ../  ")
-	}
-	fmt.Println()
-
 }
 
 func validation() string {
@@ -165,102 +184,32 @@ func returnGroupAndUSerId(path string) (string, string, string) {
 	file_info, err := os.Lstat(path)
 	if err != nil {
 		fmt.Print(file_info)
-		log.Fatal(err)	
+		log.Fatal(err)
 	}
-	file_sys := file_info.Sys()
-	GID := fmt.Sprint(file_sys.(*syscall.Stat_t).Gid)
-	UID := fmt.Sprint(file_sys.(*syscall.Stat_t).Uid)
-	flink := fmt.Sprint(file_sys.(*syscall.Stat_t).Nlink)
-	grId, _ := user.LookupGroupId(GID)
-	usrId, _ := user.LookupId(UID)
+	// file_sys := file_info.Sys()
+	// GID := fmt.Sprint(file_sys.(*syscall.Stat_t).Gid)
+	// UID := fmt.Sprint(file_sys.(*syscall.Stat_t).Uid)
+	// flink := fmt.Sprint(file_sys.(*syscall.Stat_t).Nlink)
+	// grId, _ := user.LookupGroupId(GID)
+	// usrId, _ := user.LookupId(UID)
 
-	return grId.Name, usrId.Username, flink
+	// return grId.Name, usrId.Username, flink
+	return "", "", "1"
 
 }
 
-func lFlag(path string,fileInfo fs.FileInfo){
-	subpath := path + "/"+ fileInfo.Name()
-				Gid, UserId, filelinks := returnGroupAndUSerId(subpath)
-				mode := fmt.Sprint(fileInfo.Mode())
-				DateAndTime := fmt.Sprintf("%s %d %d:%d",fileInfo.ModTime().Month().String(),fileInfo.ModTime().Day(),fileInfo.ModTime().Hour(),fileInfo.ModTime().Minute())
-				size := fmt.Sprint(fileInfo.Size())
-				if fileInfo.Size() < 10 {
-					size = "   " +size
-				} else if fileInfo.Size() < 100 {
-					size = "  " +size
-				} else if fileInfo.Size() < 1000 {
-					size = "   " +size
-				}
-				fmt.Print(mode + " " + filelinks + " " + UserId + " " + Gid + " " + size + " " + DateAndTime + " ")
+func lFlag(path string, fileInfo fs.FileInfo) {
+	subpath := path + "/" + fileInfo.Name()
+	Gid, UserId, filelinks := returnGroupAndUSerId(subpath)
+	mode := fmt.Sprint(fileInfo.Mode())
+	DateAndTime := fmt.Sprintf("%s %d %d:%d", fileInfo.ModTime().Month().String(), fileInfo.ModTime().Day(), fileInfo.ModTime().Hour(), fileInfo.ModTime().Minute())
+	size := fmt.Sprint(fileInfo.Size())
+	if fileInfo.Size() < 10 {
+		size = "   " + size
+	} else if fileInfo.Size() < 100 {
+		size = "  " + size
+	} else if fileInfo.Size() < 1000 {
+		size = "   " + size
+	}
+	fmt.Print(mode + " " + filelinks + " " + UserId + " " + Gid + " " + size + " " + DateAndTime + " ")
 }
-
-// func listFilesRecursively(dirPath, indent string) error {
-// 	dir, err := os.Open(dirPath)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	defer dir.Close()
-
-// 	fileInfos, err := dir.Readdir(-1)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	for _, fileInfo := range fileInfos {
-// 		fileName := fileInfo.Name()
-// 		if fileName != "." && fileName != ".." {
-// 			fmt.Print(indent)
-// 			if fileInfo.IsDir() {
-// 				fmt.Printf("%s \n ", fileName)
-// 				subDirPath := dirPath + "/" + fileName
-// 				subIndent := indent + "  "
-// 				err := listFilesRecursively(subDirPath, subIndent)
-// 				if err != nil {
-// 					return err
-// 				}
-// 			} else {
-// 				fmt.Println(fileName)
-// 			}
-// 		} else {
-// 			fmt.Print(indent)
-
-// 		}
-// 	}
-
-// 	return nil
-// }
-
-// func validation() (string,bool){
-// 	l_flag, R_flag, a_flag, r_flag, t_flag, pathname := false, false, false, false, false, "."
-
-// 	if len(os.Args) < 2 || os.Args[1] != "ls" {
-// 		fmt.Println("Error, read the manPage 1")
-// 		os.Exit(0)
-// 	} else if len(os.Args) == 3 {
-// 				if !l_flag && os.Args[2] == "-l" {
-// 					l_flag = true
-// 				} else if !R_flag && os.Args[2] == "-R" {
-// 					R_flag = true
-// 				} else if !a_flag && os.Args[2] == "-a" {
-// 					a_flag = true
-// 				} else if !r_flag && os.Args[2] == "-r" {
-// 					r_flag = true
-// 				} else if !t_flag && os.Args[2] == "-t" {
-// 					t_flag = true
-// 				} else {
-// 					fmt.Println("Error, read the manPage 2")
-// 					os.Exit(0)
-// 				}
-// 				fmt.Print(R_flag)
-// 	} else if len(os.Args) !=2 {
-// 		fmt.Println("Error, read the manPage 3")
-// 		os.Exit(0)
-// 	}
-// 	fmt.Print(R_flag)
-
-// 	if len(os.Args) == 4 {
-// 		pathname = os.Args[3]
-// 	}
-
-// 	return pathname,R_flag
-// }
