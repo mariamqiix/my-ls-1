@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"log"
+	"math"
 	"os"
 	// "os/user"
 	"strings"
@@ -21,6 +22,7 @@ var ls bool
 func main() {
 	pathname := validation()
 	x := listing(pathname)
+
 	if R_flag {
 		fmt.Println(".:")
 	}
@@ -43,6 +45,9 @@ func listing(dir string) []fs.FileInfo {
 }
 
 func Print(path string, fileInfos []fs.FileInfo) {
+	if l_flag { 
+		fmt.Println("total", math.Round(totalSize(fileInfos, path)))
+	}
 	if t_flag {
 		fileInfos = SortByDate(fileInfos)
 	}
@@ -52,7 +57,6 @@ func Print(path string, fileInfos []fs.FileInfo) {
 			fmt.Print("../  ./")
 		}
 	}
-
 	for i := 0; i < len(fileInfos); i++ {
 		index := i
 		if r_flag {
@@ -212,4 +216,38 @@ func lFlag(path string, fileInfo fs.FileInfo) {
 		size = "   " + size
 	}
 	fmt.Print(mode + " " + filelinks + " " + UserId + " " + Gid + " " + size + " " + DateAndTime + " ")
+}
+
+func checkShortCut(path string) bool {
+	file_info, err := os.Lstat(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if file_info.Mode()&os.ModeSymlink != 0 {
+		return true
+	}
+
+	if strings.Contains(path, ".ink") {
+		return true
+	}
+
+	return false
+}
+
+func totalSize(fileInfo []fs.FileInfo , path string) float64 {
+	size := 0.0
+
+	for i := 0; i < len(fileInfo); i++ {
+		subPath := ""
+		size += math.Round(float64(fileInfo[i].Size()) / 1024.0)
+		if fileInfo[i].IsDir() {
+		if path != "./" {
+			subPath += path + "/" + fileInfo[i].Name()
+		} else {
+			subPath = "./" + fileInfo[i].Name()
+		}
+			size += math.Round(totalSize(listing(subPath), subPath))
+		}
+	}
+	return size
 }
