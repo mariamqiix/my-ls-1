@@ -22,11 +22,11 @@ var ls bool
 func main() {
 	pathname := validation()
 	x := listing(pathname)
-
 	if R_flag {
 		fmt.Println(".:")
 	}
 	Print(pathname, x)
+	
 }
 
 func listing(dir string) []fs.FileInfo {
@@ -46,16 +46,30 @@ func listing(dir string) []fs.FileInfo {
 
 func Print(path string, fileInfos []fs.FileInfo) {
 	if l_flag { 
-		fmt.Println("total", math.Round(totalSize(fileInfos, path)))
+		if a_flag { 
+			file1 , err := os.Stat(".") 
+			if err != nil {
+				log.Fatal(err)
+			}
+			file2 , err := os.Stat("..") 
+			if err != nil {
+				log.Fatal(err)
+			}
+			fileInfos = append([]fs.FileInfo{file2}, fileInfos...)
+			fileInfos = append([]fs.FileInfo{file1}, fileInfos...)
+
+		}
+		fmt.Println("total", math.Round(float64(totalSize(fileInfos, path))/1024.0))
 	}
 	if t_flag {
 		fileInfos = SortByDate(fileInfos)
 	}
 
 	if a_flag && !r_flag {
-		if !R_flag {
-			fmt.Print("../  ./")
+		if !R_flag && !l_flag {
+			fmt.Print("../  ./ ")
 		}
+
 	}
 	for i := 0; i < len(fileInfos); i++ {
 		index := i
@@ -82,7 +96,7 @@ func Print(path string, fileInfos []fs.FileInfo) {
 
 	fmt.Println()
 
-	if a_flag && r_flag {
+	if a_flag && r_flag  && !l_flag {
 		fmt.Println("./  ../  ")
 	}
 
@@ -112,8 +126,8 @@ func Rflag(path string, fileInfos []fs.FileInfo) {
 			index = len(fileInfos) - i - 1
 		}
 		fileInfo := fileInfos[index]
-		if fileInfo.Name()[0] != '.' || a_flag {
-			if fileInfo.IsDir() {
+		if fileInfo.Name()[0] != '.' || a_flag && fileInfo.Name() != ".." && fileInfo.Name() != "." {
+			if fileInfo.IsDir()  && fileInfo.Name() != "WinSAT" {
 				subPath := ""
 				if path != "./" {
 					subPath = path + "/" + fileInfo.Name()
@@ -234,20 +248,22 @@ func checkShortCut(path string) bool {
 	return false
 }
 
-func totalSize(fileInfo []fs.FileInfo , path string) float64 {
-	size := 0.0
+func totalSize(fileInfo []fs.FileInfo , path string) int64 {
+	size := int64(0)
 
 	for i := 0; i < len(fileInfo); i++ {
+		if fileInfo[i].Name()[0] != '.' || a_flag {
 		subPath := ""
-		size += math.Round(float64(fileInfo[i].Size()) / 1024.0)
-		if fileInfo[i].IsDir() {
+		size += (fileInfo[i].Size())
+		if fileInfo[i].IsDir() && fileInfo[i].Name() != "WinSAT" {
 		if path != "./" {
 			subPath += path + "/" + fileInfo[i].Name()
 		} else {
 			subPath = "./" + fileInfo[i].Name()
 		}
-			size += math.Round(totalSize(listing(subPath), subPath))
+			size += totalSize(listing(subPath), subPath)
 		}
 	}
+}
 	return size
 }
