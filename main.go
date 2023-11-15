@@ -7,9 +7,9 @@ import (
 	"log"
 	"math"
 	"os"
-	// "os/user"
+	"os/user"
 	"strings"
-	// "syscall"
+	"syscall"
 )
 
 var l_flag bool
@@ -26,7 +26,7 @@ func main() {
 		fmt.Println(".:")
 	}
 	Print(pathname, x)
-	
+
 }
 
 func listing(dir string) []fs.FileInfo {
@@ -45,13 +45,13 @@ func listing(dir string) []fs.FileInfo {
 }
 
 func Print(path string, fileInfos []fs.FileInfo) {
-	if l_flag { 
-		if a_flag { 
-			file1 , err := os.Stat(".") 
+	if l_flag {
+		if a_flag {
+			file1, err := os.Stat(".")
 			if err != nil {
 				log.Fatal(err)
 			}
-			file2 , err := os.Stat("..") 
+			file2, err := os.Stat("..")
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -59,7 +59,7 @@ func Print(path string, fileInfos []fs.FileInfo) {
 			fileInfos = append([]fs.FileInfo{file1}, fileInfos...)
 
 		}
-		fmt.Println("total", math.Round(float64(totalSize(fileInfos, path))/1024.0))
+		fmt.Println("total", math.Round(float64(totalSize(fileInfos, path))))
 	}
 	if t_flag {
 		fileInfos = SortByDate(fileInfos)
@@ -69,7 +69,6 @@ func Print(path string, fileInfos []fs.FileInfo) {
 		if !R_flag && !l_flag {
 			fmt.Print("../  ./ ")
 		}
-
 	}
 	for i := 0; i < len(fileInfos); i++ {
 		index := i
@@ -82,11 +81,16 @@ func Print(path string, fileInfos []fs.FileInfo) {
 				lFlag(path, fileInfo)
 			}
 			if fileInfo.IsDir() {
-				fmt.Print("\033[34m", fmt.Sprintf("%s/  ", fileInfo.Name()))
-				fmt.Print("\033[97m", "")
+				fmt.Print("\033[34m", fmt.Sprintf("%s/  ", fileInfo.Name()),"\033[97m", "")
 			} else {
-				fmt.Print("\033[33m", fileInfo.Name()+"  ")
-				fmt.Print("\033[97m", "")
+				subPath := returnPath(fileInfo.Name(), path)
+
+				if checkShortCut(subPath) && l_flag {
+					shortName, _ := os.Readlink(subPath)
+					fmt.Print("\033[36m", fileInfo.Name()+" ", "\033[97m", "-> ", "\033[34m", shortName, "\033[97m")
+				} else {
+					fmt.Print("\033[33m", fileInfo.Name()+"  ","\033[97m", "")
+				}
 			}
 			if l_flag {
 				fmt.Println()
@@ -94,9 +98,7 @@ func Print(path string, fileInfos []fs.FileInfo) {
 		}
 	}
 
-	fmt.Println()
-
-	if a_flag && r_flag  && !l_flag {
+	if a_flag && r_flag && !l_flag {
 		fmt.Println("./  ../  ")
 	}
 
@@ -127,14 +129,8 @@ func Rflag(path string, fileInfos []fs.FileInfo) {
 		}
 		fileInfo := fileInfos[index]
 		if fileInfo.Name()[0] != '.' || a_flag && fileInfo.Name() != ".." && fileInfo.Name() != "." {
-			if fileInfo.IsDir()  && fileInfo.Name() != "WinSAT" {
-				subPath := ""
-				if path != "./" {
-					subPath = path + "/" + fileInfo.Name()
-				} else {
-					subPath = path + fileInfo.Name()
-
-				}
+			if fileInfo.IsDir() && fileInfo.Name() != "WinSAT" {
+				subPath := returnPath(fileInfo.Name(), path)
 				fmt.Println("\n" + subPath + ":")
 				fmt.Print("\033[97m", "")
 				Print(subPath, listing(subPath))
@@ -143,17 +139,26 @@ func Rflag(path string, fileInfos []fs.FileInfo) {
 	}
 }
 
+func returnPath(fileName, path string) string {
+	subPath := ""
+	if path != "./" {
+		subPath = path + "/" + fileName
+	} else {
+		subPath = path + fileName
+
+	}
+	return subPath
+}
+
 func validation() string {
 	//chek the argument
-	if len(os.Args) > 3 || len(os.Args) < 2 {
-		os.Exit(0)
-	} else if os.Args[1] != "ls" {
+	if len(os.Args) < 2  || os.Args[1] != "ls" {
 		os.Exit(0)
 	} else if len(os.Args) == 2 {
 		ls = true
 	} else {
 		// spilt the args so maybe we have more than 1 flag
-		Flags := strings.Split(os.Args[2], " ")
+		Flags := os.Args[2:]
 		// path name if it exist
 		PhathName := "./"
 		// for the flags range
@@ -193,7 +198,7 @@ func CheckFlag(c rune) {
 	} else if c == rune('t') {
 		t_flag = true
 	} else {
-		fmt.Print("unvslid input")
+		fmt.Println("unvslid input")
 		os.Exit(0)
 	}
 }
@@ -204,15 +209,15 @@ func returnGroupAndUSerId(path string) (string, string, string) {
 		fmt.Print(file_info)
 		log.Fatal(err)
 	}
-	// file_sys := file_info.Sys()
-	// GID := fmt.Sprint(file_sys.(*syscall.Stat_t).Gid)
-	// UID := fmt.Sprint(file_sys.(*syscall.Stat_t).Uid)
-	// flink := fmt.Sprint(file_sys.(*syscall.Stat_t).Nlink)
-	// grId, _ := user.LookupGroupId(GID)
-	// usrId, _ := user.LookupId(UID)
+	file_sys := file_info.Sys()
+	GID := fmt.Sprint(file_sys.(*syscall.Stat_t).Gid)
+	UID := fmt.Sprint(file_sys.(*syscall.Stat_t).Uid)
+	flink := fmt.Sprint(file_sys.(*syscall.Stat_t).Nlink)
+	grId, _ := user.LookupGroupId(GID)
+	usrId, _ := user.LookupId(UID)
 
-	// return grId.Name, usrId.Username, flink
-	return "", "", "1"
+	return grId.Name, usrId.Username, flink
+	// return "", "", "1"
 
 }
 
@@ -220,7 +225,7 @@ func lFlag(path string, fileInfo fs.FileInfo) {
 	subpath := path + "/" + fileInfo.Name()
 	Gid, UserId, filelinks := returnGroupAndUSerId(subpath)
 	mode := fmt.Sprint(fileInfo.Mode())
-	DateAndTime := fmt.Sprintf("%s %d %d:%d", fileInfo.ModTime().Month().String(), fileInfo.ModTime().Day(), fileInfo.ModTime().Hour(), fileInfo.ModTime().Minute())
+	DateAndTime := fmt.Sprintf("%s %d %d:%d", fileInfo.ModTime().Month().String()[:3], fileInfo.ModTime().Day(), fileInfo.ModTime().Hour(), fileInfo.ModTime().Minute())
 	size := fmt.Sprint(fileInfo.Size())
 	if fileInfo.Size() < 10 {
 		size = "   " + size
@@ -228,6 +233,14 @@ func lFlag(path string, fileInfo fs.FileInfo) {
 		size = "  " + size
 	} else if fileInfo.Size() < 1000 {
 		size = "   " + size
+	}
+	if strings.Contains(mode, "Drw-rw-") || strings.Contains(mode, "Dcrw--") || strings.Contains(mode, "Dcrw-") {
+		if Gid == "disk" {
+			mode = strings.ReplaceAll(mode, "Dc", "b")
+			mode = strings.ReplaceAll(mode, "D", "b")
+		} else {
+			mode = strings.Replace(mode, "D", "", 1)
+		}
 	}
 	fmt.Print(mode + " " + filelinks + " " + UserId + " " + Gid + " " + size + " " + DateAndTime + " ")
 }
@@ -238,6 +251,7 @@ func checkShortCut(path string) bool {
 		log.Fatal(err)
 	}
 	if file_info.Mode()&os.ModeSymlink != 0 {
+		// fmt.Print(os.ModeSymlink)
 		return true
 	}
 
@@ -248,22 +262,32 @@ func checkShortCut(path string) bool {
 	return false
 }
 
-func totalSize(fileInfo []fs.FileInfo , path string) int64 {
+func totalSize(fileInfo []fs.FileInfo, path string) int64 {
 	size := int64(0)
-
 	for i := 0; i < len(fileInfo); i++ {
 		if fileInfo[i].Name()[0] != '.' || a_flag {
-		subPath := ""
-		size += (fileInfo[i].Size())
-		if fileInfo[i].IsDir() && fileInfo[i].Name() != "WinSAT" {
-		if path != "./" {
-			subPath += path + "/" + fileInfo[i].Name()
-		} else {
-			subPath = "./" + fileInfo[i].Name()
-		}
-			size += totalSize(listing(subPath), subPath)
+			subPath := ""
+
+			if fileInfo[i].IsDir() {
+				subPath = returnPath(fileInfo[i].Name(), path)
+			} else {
+				subPath = fileInfo[i].Name()
+			}
+
+			fileInfo, err := os.Stat(subPath)
+
+			if err == nil {
+				stat, ok := fileInfo.Sys().(*syscall.Stat_t)
+				if ok {
+					blockSize := int64(stat.Blksize)
+					blocks := stat.Blocks
+					diskUsage := blocks * blockSize
+					size += diskUsage
+				}
+			}
+			
 		}
 	}
-}
-	return size
+
+	return size/8192
 }
