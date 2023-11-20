@@ -32,7 +32,6 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 			fileInfos = append([]fs.FileInfo{file2}, fileInfos...)
 			fileInfos = append([]fs.FileInfo{file1}, fileInfos...)
 		}
-
 		fmt.Println("total", math.Round(float64(TotalSize(fileInfos, path))))
 	}
 
@@ -124,11 +123,11 @@ func Rflag(path string, fileInfos []fs.FileInfo) {
 		if r_flag {
 			index = len(fileInfos) - i - 1
 		}
-
 		fileInfo := fileInfos[index]
 
 		if fileInfo.Name()[0] != '.' || a_flag && fileInfo.Name() != ".." && fileInfo.Name() != "." {
 			if fileInfo.IsDir() && fileInfo.Name() != "WinSAT" {
+
 				subPath := ReturnPath(fileInfo.Name(), path)
 				fmt.Println("\n" + subPath + ":")
 				fmt.Print("\033[97m", "")
