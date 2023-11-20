@@ -3,6 +3,6 @@ package main
 import "my-ls/Myls"
 
 func main() {
-	pathname := Myls.Validation()
-	Myls.Print(pathname, Myls.Listing(pathname))
+	pathname,subFile := Myls.Validation()
+	Myls.Print(pathname,subFile, Myls.Listing(pathname))
 }

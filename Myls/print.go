@@ -9,7 +9,14 @@ import (
 	"strings"
 )
 
-func Print(path string, fileInfos []fs.FileInfo) {
+func Print(path, subFile string, fileInfos []fs.FileInfo) {
+
+	fileInfos = SortByAlph(fileInfos)
+
+	if SubFile_flag {
+		fileInfos = fileFilter(subFile, fileInfos)
+	}
+
 	if l_flag {
 		if a_flag {
 			file1, err := os.Stat(".")
@@ -31,9 +38,6 @@ func Print(path string, fileInfos []fs.FileInfo) {
 
 	if t_flag {
 		fileInfos = SortByDate(fileInfos)
-
-	} else if l_flag { //cehck here maryam
-		fileInfos = SortByAlph(fileInfos)
 
 	}
 
@@ -75,7 +79,9 @@ func Print(path string, fileInfos []fs.FileInfo) {
 			}
 		}
 	}
-
+	if !l_flag {
+		fmt.Println()
+	}
 	if a_flag && r_flag && !l_flag {
 		fmt.Println("./  ../  ")
 	}
@@ -126,8 +132,20 @@ func Rflag(path string, fileInfos []fs.FileInfo) {
 				subPath := ReturnPath(fileInfo.Name(), path)
 				fmt.Println("\n" + subPath + ":")
 				fmt.Print("\033[97m", "")
-				Print(subPath, Listing(subPath))
+				Print(subPath, "", Listing(subPath))
 			}
 		}
 	}
+}
+
+func fileFilter(subfile string, files []fs.FileInfo) []fs.FileInfo {
+	var files2 []fs.FileInfo
+	for _, file := range files {
+		if file.Name() == subfile {
+			files2 = append(files2, file)
+		}
+	}
+
+	return files2
+
 }

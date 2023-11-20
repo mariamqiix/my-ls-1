@@ -6,15 +6,16 @@ import (
 )
 
 var (
-	l_flag bool
-	R_flag bool
-	a_flag bool
-	r_flag bool
-	t_flag bool
-	ls     bool
+	l_flag       bool
+	R_flag       bool
+	a_flag       bool
+	r_flag       bool
+	t_flag       bool
+	ls           bool
+	SubFile_flag bool
 )
 
-func Validation() string {
+func Validation() (string, string) {
 	//chek the argument
 	if len(os.Args) < 2 || os.Args[1] != "ls" {
 		os.Exit(0)
@@ -25,6 +26,7 @@ func Validation() string {
 		Flags := os.Args[2:]
 		// path name if it exist
 		PhathName := "./"
+		subFile := ""
 		// for the flags range
 		for _, flag := range Flags {
 			if flag[0] == '-' {
@@ -37,19 +39,20 @@ func Validation() string {
 					}
 				}
 			} else {
-				if string(rune(flag[0])) == "/" || flag[0:1] == "./" {
+				if string(rune(flag[0])) == "/" || flag[0:2] == "./" {
 					PhathName = flag
 				} else {
-					PhathName += flag
+					SubFile_flag = true
+					subFile = flag
 				}
 			}
 		}
-		return PhathName
+		return PhathName, subFile
 	}
 	if R_flag {
 		fmt.Println(".:")
 	}
-	return "./"
+	return "./", ""
 }
 
 // will edit the flag
