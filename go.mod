@@ -1,3 +1,3 @@
-module groupie-tracker
+module my-ls
 
-go 1.21
+go 1.20
