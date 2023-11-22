@@ -45,6 +45,7 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 	}
 
 	for i := 0; i < len(fileInfos); i++ {
+
 		index := i
 		if r_flag {
 			index = len(fileInfos) - i - 1
@@ -53,6 +54,8 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 		fileInfo := fileInfos[index]
 
 		if fileInfo.Name()[0] != '.' || a_flag {
+
+
 			if l_flag {
 				lFlag(path, fileInfo)
 			}
@@ -83,6 +86,7 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 	}
 	if a_flag && r_flag && !l_flag {
 		fmt.Println("./  ../  ")
+		
 	}
 
 	if R_flag {
@@ -96,14 +100,6 @@ func lFlag(path string, fileInfo fs.FileInfo) {
 
 	DateAndTime := fmt.Sprintf("%s %d %02d:%02d", fileInfo.ModTime().Month().String()[:3], fileInfo.ModTime().Day(), fileInfo.ModTime().Hour(), fileInfo.ModTime().Minute())
 	size := fmt.Sprint(fileInfo.Size())
-
-	if fileInfo.Size() < 10 {
-		size = "   " + size
-	} else if fileInfo.Size() < 100 {
-		size = "  " + size
-	} else if fileInfo.Size() < 1000 {
-		size = "   " + size
-	}
 
 	if strings.Contains(mode, "Drw-rw-") || strings.Contains(mode, "Dcrw--") || strings.Contains(mode, "Dcrw-") {
 		if Gid == "disk" {
@@ -127,7 +123,6 @@ func Rflag(path string, fileInfos []fs.FileInfo) {
 
 		if fileInfo.Name()[0] != '.' || a_flag && fileInfo.Name() != ".." && fileInfo.Name() != "." {
 			if fileInfo.IsDir() && fileInfo.Name() != "WinSAT" {
-
 				subPath := ReturnPath(fileInfo.Name(), path)
 				fmt.Println("\n" + subPath + ":")
 				fmt.Print("\033[97m", "")
@@ -139,6 +134,7 @@ func Rflag(path string, fileInfos []fs.FileInfo) {
 
 func fileFilter(subfile string, files []fs.FileInfo) []fs.FileInfo {
 	var files2 []fs.FileInfo
+	
 	for _, file := range files {
 		if file.Name() == subfile {
 			files2 = append(files2, file)
@@ -146,5 +142,4 @@ func fileFilter(subfile string, files []fs.FileInfo) []fs.FileInfo {
 	}
 
 	return files2
-
 }

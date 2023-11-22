@@ -24,7 +24,6 @@ func Listing(dir string) []fs.FileInfo {
 	}
 
 	return fileInfos
-
 }
 
 func ReturnPath(fileName, path string) string {
@@ -52,7 +51,6 @@ func ReturnGroupAndUSerId(path string) (string, string, string) {
 }
 
 func CheckShortCut(path string) bool {
-
 	file_info, err := os.Lstat(path)
 	if err != nil {
 		log.Fatal(err)
