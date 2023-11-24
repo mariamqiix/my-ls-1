@@ -40,9 +40,9 @@ func Validation() (string, string) {
 					}
 				}
 			} else {
-				_ , err := os.Stat(flag+ "/")
+				_, err := os.Stat(flag + "/")
 				if err == nil {
-				PhathName = flag +"/"
+					PhathName = flag + "/"
 				} else if strings.Contains(flag, "/") || string(rune(flag[0])) == "/" || flag[0:2] == "./" {
 					PhathName = flag
 				} else {

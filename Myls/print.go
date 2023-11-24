@@ -18,10 +18,10 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 		fileInfos = fileFilter(subFile, fileInfos)
 	}
 
-	if len(fileInfos) == 0 { 
-		fmt.Println("ls: cannot access '"+subFile+"': No such file or directory")
+	if len(fileInfos) == 0 {
+		fmt.Println("ls: cannot access '" + subFile + "': No such file or directory")
 		os.Exit(0)
-	
+
 	}
 
 	file2, err := os.Stat("..")
@@ -93,7 +93,7 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 func lFlag(path, maxSize string, fileInfo fs.FileInfo) {
 	Gid, UserId, filelinks := ReturnGroupAndUSerId(path + "/" + fileInfo.Name())
 	mode := fmt.Sprint(fileInfo.Mode())
-	DateAndTime := fmt.Sprintf("%s %s %02d:%02d", fileInfo.ModTime().Month().String()[:3], FormatDate(fileInfo.ModTime().Day()) , fileInfo.ModTime().Hour(), fileInfo.ModTime().Minute())
+	DateAndTime := fmt.Sprintf("%s %s %02d:%02d", fileInfo.ModTime().Month().String()[:3], FormatDate(fileInfo.ModTime().Day()), fileInfo.ModTime().Hour(), fileInfo.ModTime().Minute())
 	size := FormatSize(fmt.Sprint(fileInfo.Size()), maxSize)
 	if strings.Contains(mode, "Drw-rw-") || strings.Contains(mode, "Dcrw--") || strings.Contains(mode, "Dcrw-") {
 		if Gid == "disk" {
@@ -153,7 +153,6 @@ func FormatSize(size, MaxSize string) string {
 	}
 	return size
 }
-
 
 func FormatDate(date int) string {
 	if date < 10 {
