@@ -232,8 +232,8 @@ func ArrayWidth(files []fs.FileInfo) int {
 	width := width()
 	maxNameSize := maxNameSize(files)
 	for i := 1; i <= 20; i++ {
-		if (maxNameSize+2)*i > width {
-			return i - 1
+		if (maxNameSize+1)*i > width {
+			return i -1
 
 		}
 	}
@@ -241,10 +241,11 @@ func ArrayWidth(files []fs.FileInfo) int {
 }
 
 func ArrayLenght(filesNumbers, ArrayWidth int) int {
-	for i := 1; i <= filesNumbers; i++ {
-		if (ArrayWidth)*i > filesNumbers {
-			return i
-		}
+	if ArrayWidth != 0 {
+	ArrayLenght := filesNumbers / ArrayWidth
+	if filesNumbers% ArrayWidth != 0 {
+		ArrayLenght += 1 }
+	return ArrayLenght
 	}
 	return 0
 }
