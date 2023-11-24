@@ -55,7 +55,7 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 			}
 
 			if fileInfo.IsDir() {
-				fmt.Print("\033[34m", fmt.Sprintf("%s/  ", "\033[1m"+fileInfo.Name())+"\033[0m", "\033[97m", "")
+				fmt.Print("\033[34m", fmt.Sprintf("%s  ", "\033[1m"+fileInfo.Name())+"\033[0m", "\033[97m", "")
 
 			} else {
 				subPath := ReturnPath(fileInfo.Name(), path)
@@ -87,7 +87,7 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 func lFlag(path, maxSize string, fileInfo fs.FileInfo) {
 	Gid, UserId, filelinks := ReturnGroupAndUSerId(path + "/" + fileInfo.Name())
 	mode := fmt.Sprint(fileInfo.Mode())
-	DateAndTime := fmt.Sprintf("%s %d %02d:%02d", fileInfo.ModTime().Month().String()[:3], fileInfo.ModTime().Day(), fileInfo.ModTime().Hour(), fileInfo.ModTime().Minute())
+	DateAndTime := fmt.Sprintf("%s %s %02d:%02d", fileInfo.ModTime().Month().String()[:3], FormatDate(fileInfo.ModTime().Day()) , fileInfo.ModTime().Hour(), fileInfo.ModTime().Minute())
 	size := FormatSize(fmt.Sprint(fileInfo.Size()), maxSize)
 	if strings.Contains(mode, "Drw-rw-") || strings.Contains(mode, "Dcrw--") || strings.Contains(mode, "Dcrw-") {
 		if Gid == "disk" {
@@ -146,4 +146,12 @@ func FormatSize(size, MaxSize string) string {
 		size = strings.Repeat(" ", len(MaxSize)-len(size)) + size
 	}
 	return size
+}
+
+
+func FormatDate(date int) string {
+	if date < 10 {
+		return " " + fmt.Sprint(date)
+	}
+	return fmt.Sprint(date)
 }
