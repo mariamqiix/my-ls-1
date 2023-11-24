@@ -11,9 +11,6 @@ import (
 )
 
 func Listing(dir string) []fs.FileInfo {
-	if dir == "" {
-		return nil
-	}
 	file, err := os.Open(dir)
 	if err != nil {
 		log.Fatal(err)
@@ -30,9 +27,6 @@ func Listing(dir string) []fs.FileInfo {
 }
 
 func ReturnPath(fileName, path string) string {
-	if path == "" {
-		return ""
-	}
 	if path != "./" {
 		return path + "/" + fileName
 	}
@@ -41,9 +35,6 @@ func ReturnPath(fileName, path string) string {
 }
 
 func ReturnGroupAndUSerId(path string) (string, string, string) {
-	if path == "" {
-		return "","",""
-	}
 	file_info, err := os.Lstat(path)
 	if err != nil {
 		fmt.Print(file_info)

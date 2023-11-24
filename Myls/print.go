@@ -128,7 +128,7 @@ func Rflag(path string, fileInfos []fs.FileInfo) {
 		}
 		fileInfo := fileInfos[index]
 
-		if fileInfo.Name()[0] != '.' || a_flag && fileInfo.Name() != ".." && fileInfo.Name() != "." && fileInfo.Name()!= ""  {
+		if fileInfo.Name()[0] != '.' || a_flag && fileInfo.Name() != ".." && fileInfo.Name() != "."  {
 			if fileInfo.IsDir() && fileInfo.Name() != "WinSAT" {
 				subPath := ReturnPath(fileInfo.Name(), path)
 				fmt.Println("\n" + subPath + ":")
