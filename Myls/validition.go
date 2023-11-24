@@ -14,8 +14,7 @@ var (
 	t_flag       bool
 	ls           bool
 	SubFile_flag bool
-	first bool
-
+	first        bool
 )
 
 func Validation() (string, string) {
