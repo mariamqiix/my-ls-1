@@ -30,7 +30,7 @@ func ReturnPath(fileName, path string) string {
 	if path != "./" {
 		return path + "/" + fileName
 	}
-	
+
 	return path + fileName
 }
 

@@ -40,7 +40,7 @@ func Validation() (string, string) {
 					}
 				}
 			} else {
-				if strings.Contains(flag,"/") || string(rune(flag[0])) == "/" || flag[0:2] == "./" {
+				if strings.Contains(flag, "/") || string(rune(flag[0])) == "/" || flag[0:2] == "./" {
 					PhathName = flag
 				} else {
 					SubFile_flag = true
