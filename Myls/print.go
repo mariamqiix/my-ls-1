@@ -18,6 +18,12 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 		fileInfos = fileFilter(subFile, fileInfos)
 	}
 
+	if len(fileInfos) == 0 { 
+		fmt.Println("ls: cannot access '"+subFile+"': No such file or directory")
+		os.Exit(0)
+	
+	}
+
 	file2, err := os.Stat("..")
 	if err == nil {
 		fileInfos = append([]fs.FileInfo{file2}, fileInfos...)
