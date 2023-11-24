@@ -8,10 +8,14 @@ import (
 	"strings"
 )
 
+
 func Print(path, subFile string, fileInfos []fs.FileInfo) {
-	if l_flag && (path == "../" || path == "./") && !SubFile_flag {
-		fmt.Println(path, ": ")
+	if (l_flag || R_flag) && first{
+		newpath := strings.Trim(path, "/")
+		fmt.Println(newpath+ ":")
 	}
+	first = false
+
 	fileInfos = SortByAlph(fileInfos)
 
 	if SubFile_flag {

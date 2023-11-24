@@ -14,6 +14,8 @@ var (
 	t_flag       bool
 	ls           bool
 	SubFile_flag bool
+	first bool
+
 )
 
 func Validation() (string, string) {
@@ -51,10 +53,8 @@ func Validation() (string, string) {
 				}
 			}
 		}
+		first = true
 		return PhathName, subFile
-	}
-	if R_flag {
-		fmt.Println(".:")
 	}
 	return "./", ""
 }
