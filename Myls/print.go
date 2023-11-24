@@ -18,20 +18,18 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 		fileInfos = fileFilter(subFile, fileInfos)
 	}
 
+	file2, err := os.Stat("..")
+	if err == nil {
+		fileInfos = append([]fs.FileInfo{file2}, fileInfos...)
+	}
+
+	file1, err := os.Stat(".")
+	if err == nil {
+		fileInfos = append([]fs.FileInfo{file1}, fileInfos...)
+	}
+
 	if l_flag {
-		if a_flag {
-			file2, err := os.Stat("..")
-			if err == nil {
-				fileInfos = append([]fs.FileInfo{file2}, fileInfos...)
-			}
-
-			file1, err := os.Stat(".")
-			if err == nil {
-				fileInfos = append([]fs.FileInfo{file1}, fileInfos...)
-			}
-		}
 		fmt.Println("total", math.Round(float64(TotalSize(fileInfos, path))))
-
 	}
 
 	if t_flag {
@@ -39,9 +37,6 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 
 	}
 
-	if a_flag && !r_flag && !R_flag && !l_flag {
-		fmt.Print("../  ./ ")
-	}
 	max := maxSize(fileInfos)
 
 	for i := 0; i < len(fileInfos); i++ {
@@ -83,10 +78,6 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 	if !l_flag {
 		fmt.Println()
 	}
-	if a_flag && r_flag && !l_flag {
-		fmt.Println("./  ../  ")
-
-	}
 
 	if R_flag {
 		Rflag(path, fileInfos)
@@ -96,10 +87,8 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 func lFlag(path, maxSize string, fileInfo fs.FileInfo) {
 	Gid, UserId, filelinks := ReturnGroupAndUSerId(path + "/" + fileInfo.Name())
 	mode := fmt.Sprint(fileInfo.Mode())
-
 	DateAndTime := fmt.Sprintf("%s %d %02d:%02d", fileInfo.ModTime().Month().String()[:3], fileInfo.ModTime().Day(), fileInfo.ModTime().Hour(), fileInfo.ModTime().Minute())
 	size := FormatSize(fmt.Sprint(fileInfo.Size()), maxSize)
-
 	if strings.Contains(mode, "Drw-rw-") || strings.Contains(mode, "Dcrw--") || strings.Contains(mode, "Dcrw-") {
 		if Gid == "disk" {
 			mode = strings.ReplaceAll(mode, "Dc", "b")
@@ -108,7 +97,6 @@ func lFlag(path, maxSize string, fileInfo fs.FileInfo) {
 			mode = strings.Replace(mode, "D", "", 1)
 		}
 	}
-
 	fmt.Print(mode + " " + filelinks + " " + UserId + " " + Gid + " " + size + " " + DateAndTime + " ")
 }
 
