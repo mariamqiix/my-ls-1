@@ -133,7 +133,8 @@ func Rflag(path string, fileInfos []fs.FileInfo) {
 			if fileInfo.IsDir() && fileInfo.Name() != "WinSAT" {
 				subPath := ReturnPath(fileInfo.Name(), path)
 				files := Listing(subPath)
-				fmt.Println("\n" + strings.Replace(subPath,"//",1) + ":")
+				subPath = strings.Replace(subPath,"//","",1)
+				fmt.Println("\n" +subPath+ ":")
 				fmt.Print("\033[97m", "")
 				if len(files) != 0 {
 				Print(subPath, "", Listing(subPath))
