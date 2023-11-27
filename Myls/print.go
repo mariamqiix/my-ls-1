@@ -17,7 +17,6 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 	}
 	first = false
 
-	fileInfos = SortByAlph(fileInfos)
 
 	if SubFile_flag {
 		fileInfos = fileFilter(subFile, fileInfos)
@@ -42,6 +41,8 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 	if l_flag {
 		fmt.Println("total", math.Round(float64(TotalSize(fileInfos, path))))
 	}
+
+	fileInfos = SortByAlph(fileInfos)
 
 	if t_flag {
 		fileInfos = SortByDate(fileInfos)
