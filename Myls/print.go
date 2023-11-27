@@ -133,7 +133,10 @@ func Rflag(path string, fileInfos []fs.FileInfo) {
 				subPath := ReturnPath(fileInfo.Name(), path)
 				fmt.Println("\n" + subPath + ":")
 				fmt.Print("\033[97m", "")
+				files := Listing(subPath)
+				if len(files) != 0 {
 				Print(subPath, "", Listing(subPath))
+				}
 			}
 		}
 	}
