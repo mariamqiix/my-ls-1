@@ -27,7 +27,7 @@ func Listing(dir string) []fs.FileInfo {
 }
 
 func ReturnPath(fileName, path string) string {
-	if path != "./" {
+	if path != "./" && rune(path[len(path)-1]) != "/" {
 		return path + "/" + fileName
 	}
 
