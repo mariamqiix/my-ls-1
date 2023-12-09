@@ -11,12 +11,6 @@ import (
 )
 
 func Print(path, subFile string, fileInfos []fs.FileInfo) {
-	if (l_flag || R_flag) && first {
-		newpath := strings.Trim(path, "/")
-		fmt.Println(newpath + ":")
-	}
-	first = false
-
 
 	if SubFile_flag {
 		fileInfos = fileFilter(subFile, fileInfos)
@@ -27,6 +21,12 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 		os.Exit(0)
 
 	}
+	
+	if (l_flag || R_flag) && first {
+		newpath := strings.Trim(path, "/")
+		fmt.Println(newpath + ":")
+	}
+	first = false
 
 	file2, err := os.Stat("..")
 	if err == nil {
