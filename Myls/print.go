@@ -218,7 +218,7 @@ func FormatNames(files []fs.FileInfo) [][]string {
 		for i := 0; i < len(files); i++ {
 			index := i
 			if r_flag {
-				index = len(files) - i
+				index = len(files) - i -1
 			}
 			if files[index].Name()[0] != '.' || a_flag {
 				Name = append(Name, files[index].Name())
@@ -267,7 +267,7 @@ func Return2DArrayLen(files []fs.FileInfo) [][]string {
 		for j := 0; j < ArrayLenght; j++ {
 			file := ""
 			if r_flag {
-				file = files[len(files)-fileNum].Name()
+				file = files[len(files)-fileNum-1].Name()
 			} else {
 				file = files[fileNum].Name()
 			}
