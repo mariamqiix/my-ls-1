@@ -21,7 +21,7 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 		os.Exit(0)
 
 	}
-	
+
 	if (l_flag || R_flag) && first {
 		newpath := strings.Trim(path, "/")
 		fmt.Println(newpath + ":")
@@ -117,7 +117,20 @@ func lFlag(path, maxSize string, fileInfo fs.FileInfo) {
 		} else {
 			mode = strings.Replace(mode, "D", "", 1)
 		}
+	} else {
+		if mode == "dtrwxrwxrwx" {
+			mode = "drwxr-xr-x"
+		}
 	}
+
+	if len(mode) < 10 {
+		mode += strings.Repeat(" " , 10-len(mode)+1)
+	}
+
+	if len(Gid) <= 7 {
+		Gid += strings.Repeat(" " , 7-len(Gid)+1)
+	}
+
 	fmt.Print(mode + " " + filelinks + " " + UserId + " " + Gid + " " + size + " " + DateAndTime + " ")
 }
 
