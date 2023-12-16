@@ -2,12 +2,10 @@ package Myls
 
 import (
 	"fmt"
-	"io/fs"
+    "os"
+    "strings"
 	"math"
-	"os"
-	"os/exec"
-	"strconv"
-	"strings"
+    "io/fs"
 )
 
 func Print(path, subFile string, fileInfos []fs.FileInfo) {
@@ -203,21 +201,30 @@ func maxNameSize(files []fs.FileInfo) int {
 }
 
 func width() int {
-	cmd := exec.Command("stty", "size")
-	cmd.Stdin = os.Stdin
-	out, err := cmd.Output()
-	if err == nil {
-
-		s := string(out)
-		s = strings.TrimSpace(s)
-		sArr := strings.Split(s, " ")
-		width, err := strconv.Atoi(sArr[1])
-		if err == nil {
-			return width
-		}
-	}
-	return 0
+	// cmd := exec.Command("stty", "size")
+	// cmd.Stdin = os.Stdin
+	// out, err := cmd.Output()
+	// if err == nil {
+	// 	s := string(out)
+	// 	s = strings.TrimSpace(s)
+	// 	sArr := strings.Split(s, " ")
+	// 	width, err := strconv.Atoi(sArr[1])
+	// 	fmt.Print(width)
+	// 	if err == nil {
+	// 		return width
+	// 	}
+	// }
+	return 179
 }
+
+
+type winsize struct {
+    Row    uint16
+    Col    uint16
+    Xpixel uint16
+    Ypixel uint16
+}
+
 
 func FormatNames(files []fs.FileInfo) [][]string {
 	width := width()
