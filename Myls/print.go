@@ -20,7 +20,7 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 
 	}
 
-	if (l_flag || R_flag) && first {
+	if (l_flag || R_flag) && first && !SubFile_flag {
 		newpath := strings.Trim(path, "/")
 		fmt.Println(newpath + ":")
 	}
