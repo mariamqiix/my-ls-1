@@ -20,7 +20,7 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 
 	}
 
-	if (l_flag || R_flag) && first && !SubFile_flag {
+	if ( R_flag) && first{
 		newpath := strings.Trim(path, "/")
 		fmt.Println(newpath + ":")
 	}
@@ -36,16 +36,17 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 		fileInfos = append([]fs.FileInfo{file1}, fileInfos...)
 	}
 
-	if l_flag {
+	if l_flag && !SubFile_flag{
 		fmt.Println("total", math.Round(float64(TotalSize(fileInfos, path))))
 	}
-
 	fileInfos = SortByAlph(fileInfos)
 
 	if t_flag {
 		fileInfos = SortByDate(fileInfos)
 
 	}
+
+
 
 	max := maxSize(fileInfos)
 
@@ -108,6 +109,9 @@ func lFlag(path, maxSize string, fileInfo fs.FileInfo) {
 	mode := fmt.Sprint(fileInfo.Mode())
 	DateAndTime := fmt.Sprintf("%s %s %02d:%02d", fileInfo.ModTime().Month().String()[:3], FormatDate(fileInfo.ModTime().Day()), fileInfo.ModTime().Hour(), fileInfo.ModTime().Minute())
 	size := FormatSize(fmt.Sprint(fileInfo.Size()), maxSize)
+	if mode == "grwxr-xr-x" || mode == "urwxr-xr-x" {
+		mode = "-rwxr-xr-x"
+	}
 	if strings.Contains(mode, "Drw-rw-") || strings.Contains(mode, "Dcrw--") || strings.Contains(mode, "Dcrw-") {
 		if Gid == "disk" {
 			mode = strings.ReplaceAll(mode, "Dc", "b")
@@ -120,6 +124,7 @@ func lFlag(path, maxSize string, fileInfo fs.FileInfo) {
 			mode = "drwxr-xr-x"
 		}
 	}
+	filelinks = strings.Repeat(" " , 3-len(filelinks)) + filelinks
 
 	if len(mode) < 10 {
 		mode += strings.Repeat(" " , 10-len(mode)+1)
@@ -129,7 +134,7 @@ func lFlag(path, maxSize string, fileInfo fs.FileInfo) {
 		Gid += strings.Repeat(" " , 7-len(Gid)+1)
 	}
 
-	fmt.Print(mode + " " + filelinks + " " + UserId + " " + Gid + " " + size + " " + DateAndTime + " ")
+	fmt.Print(strings.ToLower(mode) + " " + filelinks + " " + UserId + " " + Gid + " " + size + " " + DateAndTime + " ")
 }
 
 func Rflag(path string, fileInfos []fs.FileInfo) {
@@ -146,6 +151,16 @@ func Rflag(path string, fileInfos []fs.FileInfo) {
 				files := Listing(subPath)
 				fmt.Println("\n" +subPath+ ":")
 				fmt.Print("\033[97m", "")
+				if a_flag {
+				file2, err := os.Stat("..")
+				if err == nil {
+				files = append([]fs.FileInfo{file2}, files...)
+				}
+				file1, err := os.Stat(".")
+				if err == nil {
+				files = append([]fs.FileInfo{file1}, files...)
+				}
+			}
 				if len(files) != 0 {
 				Print(subPath, "", Listing(subPath))
 				}
