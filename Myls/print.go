@@ -10,11 +10,19 @@ import (
 
 func RunLS() {
 	pathname, subFile := Validation()
+	if SubFile_flag {
 	Print("./", subFile, Listing("./"))
+	fmt.Println()
+	}
 	for i := 0 ; i < len(pathname) ; i++ {
+		if SubFile_flag == false || pathname[0] != "./" {
+			if R_flag {
+				fmt.Println(pathname[i]+":")
+			}
 		SubFile_flag = false
-		Print(pathname[i], []string, Listing(pathname[i]))
-
+		var subFiles []string
+		Print(pathname[i], subFiles , Listing(pathname[i]))
+		}
 	}
 }
 
@@ -27,12 +35,6 @@ func Print(path string , subFile []string, fileInfos []fs.FileInfo) {
 	if len(fileInfos) == 0 && SubFile_flag {
 		return
 	}
-
-	if (R_flag) && first {
-		newpath := strings.Trim(path, "/")
-		fmt.Println(newpath + ":")
-	}
-	first = false
 
 	file2, err := os.Stat("..")
 	if err == nil {
@@ -157,18 +159,9 @@ func Rflag(path string, fileInfos []fs.FileInfo) {
 				files := Listing(subPath)
 				fmt.Println("\n" + subPath + ":")
 				fmt.Print("\033[97m", "")
-				if a_flag {
-					file2, err := os.Stat("..")
-					if err == nil {
-						files = append([]fs.FileInfo{file2}, files...)
-					}
-					file1, err := os.Stat(".")
-					if err == nil {
-						files = append([]fs.FileInfo{file1}, files...)
-					}
-				}
-				if len(files) != 0 {
-					Print(subPath, "", Listing(subPath))
+				if len(files) != 0 || a_flag {
+					var subFile []string
+					Print(subPath,subFile , Listing(subPath))
 				}
 			}
 		}
@@ -180,7 +173,7 @@ func fileFilter(subfile []string, files []fs.FileInfo) []fs.FileInfo {
 	for i := 0; i < len(subfile); i++ {
 		flag := false
 		for _, file := range files {
-			if file.Name() == subfile {
+			if file.Name() == subfile[i] {
 				flag = true
 				files2 = append(files2, file)
 			}
