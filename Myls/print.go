@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+// type TheFiles struct 
+
 func RunLS() {
 	pathname, subFile := Validation()
 	if SubFile_flag {
