@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"strings"
 )
+
 func SortByAlph(filesInfos []fs.FileInfo) []fs.FileInfo {
 	n := len(filesInfos)
 	for i := 0; i < n-1; i++ {

@@ -2,25 +2,33 @@ package Myls
 
 import (
 	"fmt"
-    "os"
-    "strings"
+	"io/fs"
 	"math"
-    "io/fs"
+	"os"
+	"strings"
 )
 
-func Print(path, subFile string, fileInfos []fs.FileInfo) {
+func RunLS() {
+	pathname, subFile := Validation()
+	Print("./", subFile, Listing("./"))
+	for i := 0 ; i < len(pathname) ; i++ {
+		SubFile_flag = false
+		Print(pathname[i], []string, Listing(pathname[i]))
+
+	}
+}
+
+func Print(path string , subFile []string, fileInfos []fs.FileInfo) {
 
 	if SubFile_flag {
 		fileInfos = fileFilter(subFile, fileInfos)
 	}
 
 	if len(fileInfos) == 0 && SubFile_flag {
-		fmt.Println("ls: cannot access '" + subFile + "': No such file or directory")
-		os.Exit(0)
-
+		return
 	}
 
-	if ( R_flag) && first{
+	if (R_flag) && first {
 		newpath := strings.Trim(path, "/")
 		fmt.Println(newpath + ":")
 	}
@@ -36,7 +44,7 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 		fileInfos = append([]fs.FileInfo{file1}, fileInfos...)
 	}
 
-	if l_flag && !SubFile_flag{
+	if l_flag && !SubFile_flag {
 		fmt.Println("total", math.Round(float64(TotalSize(fileInfos, path))))
 	}
 	fileInfos = SortByAlph(fileInfos)
@@ -45,8 +53,6 @@ func Print(path, subFile string, fileInfos []fs.FileInfo) {
 		fileInfos = SortByDate(fileInfos)
 
 	}
-
-
 
 	max := maxSize(fileInfos)
 
@@ -124,14 +130,14 @@ func lFlag(path, maxSize string, fileInfo fs.FileInfo) {
 			mode = "drwxr-xr-x"
 		}
 	}
-	filelinks = strings.Repeat(" " , 3-len(filelinks)) + filelinks
+	filelinks = strings.Repeat(" ", 3-len(filelinks)) + filelinks
 
 	if len(mode) < 10 {
-		mode += strings.Repeat(" " , 10-len(mode)+1)
+		mode += strings.Repeat(" ", 10-len(mode)+1)
 	}
 
 	if len(Gid) <= 7 {
-		Gid += strings.Repeat(" " , 7-len(Gid)+1)
+		Gid += strings.Repeat(" ", 7-len(Gid)+1)
 	}
 
 	fmt.Print(strings.ToLower(mode) + " " + filelinks + " " + UserId + " " + Gid + " " + size + " " + DateAndTime + " ")
@@ -145,40 +151,47 @@ func Rflag(path string, fileInfos []fs.FileInfo) {
 		}
 		fileInfo := fileInfos[index]
 
-		if fileInfo.Name()[0] != '.' || a_flag && fileInfo.Name() != ".." && fileInfo.Name() != "."  {
+		if fileInfo.Name()[0] != '.' || a_flag && fileInfo.Name() != ".." && fileInfo.Name() != "." {
 			if fileInfo.IsDir() && fileInfo.Name() != "WinSAT" {
 				subPath := ReturnPath(fileInfo.Name(), path)
 				files := Listing(subPath)
-				fmt.Println("\n" +subPath+ ":")
+				fmt.Println("\n" + subPath + ":")
 				fmt.Print("\033[97m", "")
 				if a_flag {
-				file2, err := os.Stat("..")
-				if err == nil {
-				files = append([]fs.FileInfo{file2}, files...)
+					file2, err := os.Stat("..")
+					if err == nil {
+						files = append([]fs.FileInfo{file2}, files...)
+					}
+					file1, err := os.Stat(".")
+					if err == nil {
+						files = append([]fs.FileInfo{file1}, files...)
+					}
 				}
-				file1, err := os.Stat(".")
-				if err == nil {
-				files = append([]fs.FileInfo{file1}, files...)
-				}
-			}
 				if len(files) != 0 {
-				Print(subPath, "", Listing(subPath))
+					Print(subPath, "", Listing(subPath))
 				}
 			}
 		}
 	}
 }
 
-func fileFilter(subfile string, files []fs.FileInfo) []fs.FileInfo {
+func fileFilter(subfile []string, files []fs.FileInfo) []fs.FileInfo {
 	var files2 []fs.FileInfo
+	for i := 0; i < len(subfile); i++ {
+		flag := false
+		for _, file := range files {
+			if file.Name() == subfile {
+				flag = true
+				files2 = append(files2, file)
+			}
+		}
+		if !flag {
+			fmt.Println("ls: cannot access '" + subfile[i] + "': No such file or directory")
 
-	for _, file := range files {
-		if file.Name() == subfile {
-			files2 = append(files2, file)
 		}
 	}
-
 	return files2
+
 }
 
 func maxSize(files []fs.FileInfo) int {
@@ -232,14 +245,12 @@ func width() int {
 	return 179
 }
 
-
 type winsize struct {
-    Row    uint16
-    Col    uint16
-    Xpixel uint16
-    Ypixel uint16
+	Row    uint16
+	Col    uint16
+	Xpixel uint16
+	Ypixel uint16
 }
-
 
 func FormatNames(files []fs.FileInfo) [][]string {
 	width := width()
@@ -253,7 +264,7 @@ func FormatNames(files []fs.FileInfo) [][]string {
 		for i := 0; i < len(files); i++ {
 			index := i
 			if r_flag {
-				index = len(files) - i -1
+				index = len(files) - i - 1
 			}
 			if files[index].Name()[0] != '.' || a_flag {
 				Name = append(Name, files[index].Name())
@@ -264,7 +275,7 @@ func FormatNames(files []fs.FileInfo) [][]string {
 	}
 
 	return Return2DArrayLen(files)
-	
+
 }
 
 func ArrayWidth(files []fs.FileInfo) int {
@@ -272,7 +283,7 @@ func ArrayWidth(files []fs.FileInfo) int {
 	maxNameSize := maxNameSize(files)
 	for i := 1; i <= 20; i++ {
 		if (maxNameSize+1)*i > width {
-			return i -1
+			return i - 1
 
 		}
 	}
@@ -281,10 +292,11 @@ func ArrayWidth(files []fs.FileInfo) int {
 
 func ArrayLenght(filesNumbers, ArrayWidth int) int {
 	if ArrayWidth != 0 {
-	ArrayLenght := filesNumbers / ArrayWidth
-	if filesNumbers% ArrayWidth != 0 {
-		ArrayLenght += 1 }
-	return ArrayLenght
+		ArrayLenght := filesNumbers / ArrayWidth
+		if filesNumbers%ArrayWidth != 0 {
+			ArrayLenght += 1
+		}
+		return ArrayLenght
 	}
 	return 0
 }
@@ -296,7 +308,7 @@ func Return2DArrayLen(files []fs.FileInfo) [][]string {
 	maxNameSize := maxNameSize(files)
 	Names := make([][]string, ArrayLenght)
 	for i := 0; i < ArrayLenght; i++ {
-	Names[i] = make([]string, ArrayWidth)
+		Names[i] = make([]string, ArrayWidth)
 	}
 	for i := 0; i < ArrayWidth; i++ {
 		for j := 0; j < ArrayLenght; j++ {

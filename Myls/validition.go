@@ -36,8 +36,8 @@ func Validation() (string, string) {
 				if len(flag) == 2 {
 					CheckFlag(rune(flag[1]))
 				} else if len(flag) < 2 {
-				fmt.Println("ls: cannot access '-': No such file or directory")
-				os.Exit(0)
+					fmt.Println("ls: cannot access '-': No such file or directory")
+					os.Exit(0)
 				} else {
 					for i := 1; i < len(flag); i++ {
 						CheckFlag(rune(flag[i]))

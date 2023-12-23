@@ -5,6 +5,5 @@ import (
 )
 
 func main() {
-	pathname, subFile := Myls.Validation()
-	Myls.Print(pathname, subFile, Myls.Listing(pathname))
+	Myls.RunLS()
 }
