@@ -87,17 +87,22 @@ func Print(path string , subFile []string, fileInfos []fs.FileInfo) {
 				}
 
 				if fileInfo.IsDir() {
-					fmt.Print("\033[34m", fmt.Sprintf("%s  ", "\033[1m"+fileInfo.Name())+"\033[0m", "\033[97m", "")
+					// fmt.Print("\033[34m", fmt.Sprintf("%s  ", "\033[1m"+fileInfo.Name()), "\033[0m", "")
+                    // blue, bold, reset
+					fmt.Printf("\033[34,1%s\033[0m", fileInfo.Name())
 
 				} else {
 					subPath := ReturnPath(fileInfo.Name(), path)
 					if CheckShortCut(subPath) && l_flag {
 						shortName, _ := os.Readlink(subPath)
-						fmt.Print("\033[36m", fileInfo.Name()+" ", "\033[97m", "-> ", "\033[34m", shortName, "\033[97m")
+						// fmt.Print("\033[36m", fileInfo.Name()+" ", "\033[0m", "-> ", "\033[34m", shortName, "\033[0m")
+                        // Cyan, reset, blue, reset
+                        fmt.Printf("\033[36m%s \033[0m-> \033[34m%s\033[0m", fileInfo.Name(), shortName)
 
 					} else {
 
-						fmt.Print("\033[97m", fileInfo.Name()+"  ", "\033[97m", "")
+						// fmt.Print("\033[0m", fileInfo.Name()+"  ", "\033[0m", "")
+                        fmt.Printf("%s ", fileInfo.Name())
 					}
 
 				}
