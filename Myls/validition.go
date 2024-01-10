@@ -53,10 +53,13 @@ func Validation() ([]string, []string) {
 					PhathName = append(PhathName,flag )
 				} else if strings.Contains(flag, "/") || string(rune(flag[0])) == "/" || flag[0:2] == "./" {
 					PhathName = append(PhathName,flag)
-				} } else {
+				 
+				} else {
+
 					SubFile_flag = true
 					subFile = append(subFile,flag)
 				}
+			}
 			}
 		}
 		first = true
