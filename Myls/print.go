@@ -70,6 +70,12 @@ func Print(path string , subFile []string, fileInfos []fs.FileInfo) {
 
 	} else {
 
+		for _, c := range fileInfos {
+			if isBlockDevice(c) {
+				divFile = true
+			}
+		}
+
 		for i := 0; i < len(fileInfos); i++ {
 
 			index := i
@@ -119,7 +125,7 @@ func Print(path string , subFile []string, fileInfos []fs.FileInfo) {
 }
 
 func lFlag(path, maxSize string, fileInfo fs.FileInfo) {
-	Gid, UserId, filelinks := ReturnGroupAndUSerId(path + "/" + fileInfo.Name())
+	Gid, UserId, filelinks,divInfo := ReturnGroupAndUSerId(path + "/" + fileInfo.Name())
 	mode := fmt.Sprint(fileInfo.Mode())
 	DateAndTime := fmt.Sprintf("%s %s %02d:%02d", fileInfo.ModTime().Month().String()[:3], FormatDate(fileInfo.ModTime().Day()), fileInfo.ModTime().Hour(), fileInfo.ModTime().Minute())
 	size := FormatSize(fmt.Sprint(fileInfo.Size()), maxSize)
@@ -146,6 +152,14 @@ func lFlag(path, maxSize string, fileInfo fs.FileInfo) {
 
 	if len(Gid) <= 7 {
 		Gid += strings.Repeat(" ", 7-len(Gid)+1)
+	}
+
+	if divFile {
+		if len(divInfo) < 8 {
+			divInfo =  strings.Repeat(" ",8- len(divInfo)) + divInfo 
+		}
+		size = divInfo 
+		
 	}
 
 	fmt.Print(strings.ToLower(mode) + " " + filelinks + " " + UserId + " " + Gid + " " + size + " " + DateAndTime + " ")

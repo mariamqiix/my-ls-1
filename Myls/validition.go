@@ -15,6 +15,8 @@ var (
 	ls           bool
 	SubFile_flag bool
 	first        bool
+	divFile       bool
+
 )
 
 func Validation() ([]string, []string) {

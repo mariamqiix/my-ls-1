@@ -13,14 +13,22 @@ import (
 func Listing(dir string) []fs.FileInfo {
 	file, err := os.Open(dir)
 	if err != nil {
+		if strings.Contains(fmt.Sprint(err),"permission denied")  {
+		fmt.Print(dir)
+		} else {
 		log.Fatal(err)
+		}
 	}
 
 	defer file.Close()
 
 	fileInfos, err := file.Readdir(-1)
 	if err != nil {
-		log.Fatal(err)
+		if strings.Contains(fmt.Sprint(err),"permission denied")  {
+			fmt.Print(dir)
+			} else {
+			log.Fatal(err)
+			}
 	}
 
 	return fileInfos
@@ -50,7 +58,7 @@ func isBlockDevice(fileInfo os.FileInfo) bool {
 	return fileInfo.Mode()&os.ModeDevice == os.ModeDevice && fileInfo.Mode()&os.ModeCharDevice == 0
 }
 
-func ReturnGroupAndUSerId(path string) (string, string, string) {
+func ReturnGroupAndUSerId(path string) (string, string, string,string ) {
 	file_info, err := os.Lstat(path)
 	if err != nil {
 		fmt.Print(file_info)
@@ -61,12 +69,18 @@ func ReturnGroupAndUSerId(path string) (string, string, string) {
 	flink := fmt.Sprint(file_sys.Nlink)
 
     dev := file_sys.Rdev
-    fmt.Fprintf(os.Stderr, "%d, %d %d\n", dev, Major(dev), Minor(dev))
+	divInfo := ""
+	if  Major(dev) != 0 {
+    divInfo = fmt.Sprintf( "%d, %d", Major(dev), Minor(dev))
+	} else {
+		divInfo = fmt.Sprintf( "%d", Minor(dev))
+
+	}
 
 	grId, _ := user.LookupGroupId(fmt.Sprint(file_sys.Gid))
 	usrId, _ := user.LookupId(fmt.Sprint(file_sys.Uid))
 
-	return grId.Name, usrId.Username, flink
+	return grId.Name, usrId.Username, flink , divInfo
 }
 
 func CheckShortCut(path string) bool {
