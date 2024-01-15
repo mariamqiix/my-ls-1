@@ -155,6 +155,9 @@ func lFlag(path, maxSize string, fileInfo fs.FileInfo) {
 	}
 
 	if divFile {
+		if divInfo == "0" {
+			divInfo = size
+		}
 		if len(divInfo) < 8 {
 			divInfo =  strings.Repeat(" ",8- len(divInfo)) + divInfo 
 		}
