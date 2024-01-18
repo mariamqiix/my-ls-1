@@ -92,9 +92,9 @@ func Print(path string , subFile []string, fileInfos []fs.FileInfo) {
 				}
 
 				if fileInfo.IsDir() {
-					// fmt.Print("\033[34m", fmt.Sprintf("%s  ", "\033[1m"+fileInfo.Name()), "\033[0m", "")
+					 fmt.Print("\033[34m", fmt.Sprintf("%s  ", "\033[1m"+fileInfo.Name()), "\033[0m", "")
                     // blue, bold, reset
-					fmt.Printf("\033[34,1%s\033[0m", fileInfo.Name())
+					// fmt.Printf("\033[34,1%s\033[0m", fileInfo.Name())
 
 				} else {
 					subPath := ReturnPath(fileInfo.Name(), path)
