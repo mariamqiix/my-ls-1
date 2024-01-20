@@ -15,8 +15,7 @@ var (
 	ls           bool
 	SubFile_flag bool
 	first        bool
-	divFile       bool
-
+	divFile      bool
 )
 
 func Validation() ([]string, []string) {
@@ -32,13 +31,10 @@ func Validation() ([]string, []string) {
 		Flags := os.Args[2:]
 		// for the flags range
 		for _, flag := range Flags {
-			if flag[0] == '-' {
+			if flag[0] == '-' && len(flag) > 1 {
 				// to check the ls flags
 				if len(flag) == 2 {
 					CheckFlag(rune(flag[1]))
-				} else if len(flag) < 2 {
-				fmt.Println("ls: cannot access '-': No such file or directory")
-				os.Exit(0)
 				} else {
 					for i := 1; i < len(flag); i++ {
 						CheckFlag(rune(flag[i]))
@@ -46,32 +42,35 @@ func Validation() ([]string, []string) {
 				}
 			} else {
 				v := ""
-				if !CheckShortCut(flag){
-				if flag[len(flag)-1:] != "/" {
-					v = flag + "/"
-				}
-				_, err := os.Stat(v)
-				if err == nil {
-					PhathName = append(PhathName,flag )
-				} else if strings.Contains(flag, "/") || string(rune(flag[0])) == "/" || flag[0:2] == "./" {
-					PhathName = append(PhathName,flag)
-				 
-				} else {
+				if !CheckShortCut(flag) {
+					if flag[len(flag)-1:] != "/" {
+						v = flag + "/"
+					}
+					_, err := os.Stat(v)
+					if err == nil {
+						PhathName = append(PhathName, flag)
+					} else if strings.Contains(flag, "/") || string(rune(flag[0])) == "/" || flag[0:2] == "./" {
+						PhathName = append(PhathName, flag)
 
+					} else {
+
+						SubFile_flag = true
+						subFile = append(subFile, flag)
+					}
+				} else if CheckShortCut(flag) {
 					SubFile_flag = true
-					subFile = append(subFile,flag)
+						subFile = append(subFile, flag)
 				}
-			}
 			}
 		}
 		first = true
 		if len(PhathName) == 0 {
-			PhathName = append(PhathName,"./")
+			PhathName = append(PhathName, "./")
 		}
 		return PhathName, subFile
 	}
 
-	PhathName = append(PhathName,"./")
+	PhathName = append(PhathName, "./")
 
 	return PhathName, subFile
 }

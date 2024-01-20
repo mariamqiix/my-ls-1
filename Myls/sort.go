@@ -1,16 +1,17 @@
 package Myls
 
 import (
-	// "fmt"
+	"fmt"
 	"io/fs"
+	"os"
 	"strings"
 )
 
 func SortByAlph(filesInfos []fs.FileInfo) []fs.FileInfo {
 	n := len(filesInfos)
-	for i := 0; i < n-1; i++ {
+	for i := 0; i < n; i++ {
 		for j := 0; j < n-i-1; j++ {
-			if strings.ToLower(filesInfos[j].Name()) > strings.ToLower(filesInfos[j+1].Name()) {
+			if strings.ToLower(strings.ReplaceAll(filesInfos[j].Name(),"-","")) > strings.ToLower(strings.ReplaceAll(filesInfos[j+1].Name(),"-","")) {
 				filesInfos[j], filesInfos[j+1] = filesInfos[j+1], filesInfos[j]
 			}
 		}
@@ -18,6 +19,25 @@ func SortByAlph(filesInfos []fs.FileInfo) []fs.FileInfo {
 	return filesInfos
 }
 
+func SortWithTildeFirst(paths []string) []string {
+	var dotSlashPaths []string
+	var otherPaths []string
+
+	for _, path := range paths {
+		if path == THePath() {
+			dotSlashPaths = append(dotSlashPaths, path)
+		} else {
+			otherPaths = append(otherPaths, path)
+		}
+	}
+
+	return append(dotSlashPaths, otherPaths...)
+}
+
+func THePath() string {
+	homeDir := os.Getenv("HOME")
+	return fmt.Sprint(homeDir)
+}
 
 // func SortByAlph(filesInfos []fs.FileInfo) []fs.FileInfo {
 // 	n := len(filesInfos)
@@ -43,8 +63,6 @@ func SortByAlph(filesInfos []fs.FileInfo) []fs.FileInfo {
 
 // 	return filesInfos
 // }
-
-
 
 func SortByDate(filesInfos []fs.FileInfo) []fs.FileInfo {
 	n := len(filesInfos)

@@ -8,29 +8,33 @@ import (
 	"strings"
 )
 
-// type TheFiles struct 
+// type TheFiles struct
 
 func RunLS() {
 	pathname, subFile := Validation()
 	if SubFile_flag {
-	Print("./", subFile, Listing("./"))
+		Print("./", subFile, Listing("./"))
 	}
-	for i := 0 ; i < len(pathname) ; i++ {
+	pathname = SortWithTildeFirst(pathname)
+	for i := 0; i < len(pathname); i++ {
 		if SubFile_flag == false || pathname[0] != "./" {
-			if R_flag {
-				fmt.Println(pathname[i]+":")
+			if R_flag || (len(pathname) > 1 && l_flag) || (SubFile_flag && l_flag){
+				if (SubFile_flag && l_flag) {
+					fmt.Println()
+				}
+				fmt.Println(pathname[i] + ":")
 			}
-		SubFile_flag = false
-		var subFiles []string
-		Print(pathname[i], subFiles , Listing(pathname[i]))
+			SubFile_flag = false
+			var subFiles []string
+			Print(pathname[i], subFiles, Listing(pathname[i]))
 		}
 		if len(pathname) != i+1 {
-		fmt.Println()
+			fmt.Println()
 		}
 	}
 }
 
-func Print(path string , subFile []string, fileInfos []fs.FileInfo) {
+func Print(path string, subFile []string, fileInfos []fs.FileInfo) {
 	if SubFile_flag {
 		fileInfos = fileFilter(subFile, fileInfos)
 	}
@@ -38,15 +42,16 @@ func Print(path string , subFile []string, fileInfos []fs.FileInfo) {
 	if len(fileInfos) == 0 && SubFile_flag {
 		return
 	}
-
-	file2, err := os.Stat(path+"/..")
+	if !SubFile_flag {
+	file2, err := os.Stat(path + "/..")
 	if err == nil {
 		fileInfos = append([]fs.FileInfo{file2}, fileInfos...)
 	}
 
-	file1, err := os.Stat(path+"/.")
+	file1, err := os.Stat(path + "/.")
 	if err == nil {
 		fileInfos = append([]fs.FileInfo{file1}, fileInfos...)
+	}
 	}
 
 	if l_flag && !SubFile_flag {
@@ -63,10 +68,10 @@ func Print(path string , subFile []string, fileInfos []fs.FileInfo) {
 
 	if !l_flag {
 		Names := FormatNames(fileInfos)
-		for i := 0; i < len(Names); i++ {
+		for i := 0; i < len(Names) && (len(Names) == 1 && len(Names[0]) != 0 ); i++ {
 			for j := 0; j < len(Names[i]); j++ {
 				fmt.Print(Names[i][j] + "  ")
-			}
+			} 
 			fmt.Println()
 		}
 
@@ -94,8 +99,8 @@ func Print(path string , subFile []string, fileInfos []fs.FileInfo) {
 				}
 
 				if fileInfo.IsDir() {
-					 fmt.Print("\033[34m", fmt.Sprintf("%s  ", "\033[1m"+fileInfo.Name()), "\033[0m", "")
-                    // blue, bold, reset
+					fmt.Print("\033[34m", fmt.Sprintf("%s  ", "\033[1m"+fileInfo.Name()), "\033[0m", "")
+					// blue, bold, reset
 					// fmt.Printf("\033[34,1%s\033[0m", fileInfo.Name())
 
 				} else {
@@ -103,13 +108,13 @@ func Print(path string , subFile []string, fileInfos []fs.FileInfo) {
 					if CheckShortCut(subPath) && l_flag {
 						shortName, _ := os.Readlink(subPath)
 						// fmt.Print("\033[36m", fileInfo.Name()+" ", "\033[0m", "-> ", "\033[34m", shortName, "\033[0m")
-                        // Cyan, reset, blue, reset
-                        fmt.Printf("\033[36m%s \033[0m-> \033[34m%s\033[0m", fileInfo.Name(), shortName)
+						// Cyan, reset, blue, reset
+						fmt.Printf("\033[36m%s \033[0m-> \033[34m%s\033[0m", fileInfo.Name(), shortName)
 
 					} else {
 
 						// fmt.Print("\033[0m", fileInfo.Name()+"  ", "\033[0m", "")
-                        fmt.Printf("%s ", fileInfo.Name())
+						fmt.Printf("%s ", fileInfo.Name())
 					}
 
 				}
@@ -127,7 +132,7 @@ func Print(path string , subFile []string, fileInfos []fs.FileInfo) {
 }
 
 func lFlag(path, maxSize string, fileInfo fs.FileInfo) {
-	Gid, UserId, filelinks,divInfo := ReturnGroupAndUSerId(path + "/" + fileInfo.Name())
+	Gid, UserId, filelinks, divInfo := ReturnGroupAndUSerId(path + "/" + fileInfo.Name())
 	mode := fmt.Sprint(fileInfo.Mode())
 	DateAndTime := fmt.Sprintf("%s %s %02d:%02d", fileInfo.ModTime().Month().String()[:3], FormatDate(fileInfo.ModTime().Day()), fileInfo.ModTime().Hour(), fileInfo.ModTime().Minute())
 	size := FormatSize(fmt.Sprint(fileInfo.Size()), maxSize)
@@ -161,10 +166,10 @@ func lFlag(path, maxSize string, fileInfo fs.FileInfo) {
 			divInfo = size
 		}
 		if len(divInfo) < 8 {
-			divInfo =  strings.Repeat(" ",8- len(divInfo)) + divInfo 
+			divInfo = strings.Repeat(" ", 8-len(divInfo)) + divInfo
 		}
-		size = divInfo 
-		
+		size = divInfo
+
 	}
 
 	fmt.Print(strings.ToLower(mode) + " " + filelinks + " " + UserId + " " + Gid + " " + size + " " + DateAndTime + " ")
@@ -186,7 +191,7 @@ func Rflag(path string, fileInfos []fs.FileInfo) {
 				fmt.Print("\033[97m", "")
 				if len(files) != 0 || a_flag {
 					var subFile []string
-					Print(subPath,subFile , Listing(subPath))
+					Print(subPath, subFile, Listing(subPath))
 				}
 			}
 		}
