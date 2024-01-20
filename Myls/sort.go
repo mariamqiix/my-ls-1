@@ -3,6 +3,7 @@ package Myls
 import (
 	// "fmt"
 	"io/fs"
+	"strings"
 )
 
 func SortByAlph(filesInfos []fs.FileInfo) []fs.FileInfo {

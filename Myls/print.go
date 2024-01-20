@@ -24,6 +24,9 @@ func RunLS() {
 		var subFiles []string
 		Print(pathname[i], subFiles , Listing(pathname[i]))
 		}
+		if len(pathname) != i+1 {
+		fmt.Println()
+		}
 	}
 }
 
