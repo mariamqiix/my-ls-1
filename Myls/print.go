@@ -16,8 +16,6 @@ func RunLS() {
 	Print("./", subFile, Listing("./"))
 	}
 	for i := 0 ; i < len(pathname) ; i++ {
-		fmt.Println(pathname[i])
-
 		if SubFile_flag == false || pathname[0] != "./" {
 			if R_flag {
 				fmt.Println(pathname[i]+":")
