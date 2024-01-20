@@ -16,6 +16,8 @@ func RunLS() {
 	Print("./", subFile, Listing("./"))
 	}
 	for i := 0 ; i < len(pathname) ; i++ {
+		fmt.Println(pathname[i])
+
 		if SubFile_flag == false || pathname[0] != "./" {
 			if R_flag {
 				fmt.Println(pathname[i]+":")
@@ -31,7 +33,6 @@ func RunLS() {
 }
 
 func Print(path string , subFile []string, fileInfos []fs.FileInfo) {
-
 	if SubFile_flag {
 		fileInfos = fileFilter(subFile, fileInfos)
 	}
@@ -40,12 +41,12 @@ func Print(path string , subFile []string, fileInfos []fs.FileInfo) {
 		return
 	}
 
-	file2, err := os.Stat("..")
+	file2, err := os.Stat(path+"/..")
 	if err == nil {
 		fileInfos = append([]fs.FileInfo{file2}, fileInfos...)
 	}
 
-	file1, err := os.Stat(".")
+	file1, err := os.Stat(path+"/.")
 	if err == nil {
 		fileInfos = append([]fs.FileInfo{file1}, fileInfos...)
 	}
